@@ -4,7 +4,7 @@
 #include <chrono>
 using namespace std;
 
-void moveDisks(int, stack<int>&, stack<int>&, stack<int>&);
+void moveDisks(int, stack<int>&, stack<int>&, stack<int>&);s
 void MoveDisksHelper(stack<int>&, stack<int>&, char, char);
 void printIt(int, char, char);
 
