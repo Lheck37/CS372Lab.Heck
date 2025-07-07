@@ -1,0 +1,16 @@
+# Assignment 07: The Seven Degrees of Kevin Bacon
+
+This project implements a graph-based simulation of the “Seven Degrees of Kevin Bacon” problem using both an adjacency list and adjacency matrix. It includes functionality to detect simple cycles and find a connection path from any node to Kevin Bacon.
+
+## Features
+
+- `Graph` interface with two implementations:
+  - `AdjacencyListGraph`
+  - `AdjacencyMatrixGraph`
+- `isSimpleCycle()` function: checks if a given path is a simple cycle
+- `findKevinBaconPath()` function: uses BFS to find the shortest connection path to Kevin Bacon
+- Graph with 20 people (nodes) and realistic social connections
+- Output includes Kevin Bacon number and cycle validation
+
+## File Structure
+
