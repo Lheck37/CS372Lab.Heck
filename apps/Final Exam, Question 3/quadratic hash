@@ -1,0 +1,136 @@
+//  Quadratic_Hash.cpp
+//  Question 3, Final Exam
+//
+//  Created by Logan Heck on 7/23/25.
+#include <iostream>
+#include <cassert>
+#include <string>
+using namespace std;
+
+// Record Definition
+struct Record {
+    int key;
+    string value;
+};
+
+// table Class with Quadratic Probing
+class Table {
+public:
+    static const std::size_t CAPACITY = 1024; // Must be power of 2
+
+    Table() {
+        used = 0;
+        for (std::size_t i = 0; i < CAPACITY; ++i) {
+            data[i].key = NEVERUSED;
+        }
+    }
+
+    void insert(const Record& entry) {
+        bool alreadyPresent;
+        std::size_t index;
+        assert(entry.key >= 0);
+        findIndex(entry.key, alreadyPresent, index);
+
+        if (!alreadyPresent) {
+            assert(size() < CAPACITY);
+            index = hash(entry.key);
+            std::size_t step = 1;
+
+            while (!isVacant(index) && data[index].key != NEVERUSED) {
+                index = quadProbe(hash(entry.key), step);
+                ++step;
+            }
+
+            ++used;
+        }
+
+        data[index] = entry;
+    }
+
+    void remove(int key) {
+        bool found;
+        std::size_t index;
+        assert(key >= 0);
+        findIndex(key, found, index);
+        if (found) {
+            data[index].key = PREVIOUSLYUSED;
+            --used;
+        }
+    }
+
+    bool isPresent(int key) const {
+        bool found;
+        std::size_t index;
+        findIndex(key, found, index);
+        return found;
+    }
+
+    std::size_t size() const {
+        return used;
+    }
+
+    void printTable() const {
+        for (std::size_t i = 0; i < CAPACITY; ++i) {
+            if (data[i].key >= 0) {
+                cout << "[" << i << "] Key: " << data[i].key
+                     << ", Value: " << data[i].value << endl;
+            }
+        }
+    }
+
+private:
+    static const int NEVERUSED = -1;
+    static const int PREVIOUSLYUSED = -2;
+
+    Record data[CAPACITY];
+    std::size_t used;
+
+    std::size_t hash(int key) const {
+        return key % CAPACITY;
+    }
+
+    std::size_t quadProbe(std::size_t base, std::size_t step) const {
+        return (base + step * step) % CAPACITY;
+    }
+
+    void findIndex(int key, bool& found, std::size_t& index) const {
+        std::size_t step = 1;
+        index = hash(key);
+        while (step < CAPACITY &&
+               !neverUsed(index) &&
+               data[index].key != key) {
+            index = quadProbe(hash(key), step);
+            ++step;
+        }
+        found = (data[index].key == key);
+    }
+
+    bool neverUsed(std::size_t index) const {
+        return (data[index].key == NEVERUSED);
+    }
+
+    bool isVacant(std::size_t index) const {
+        return (data[index].key == NEVERUSED || data[index].key == PREVIOUSLYUSED);
+    }
+};
+
+// Main Function
+int main() {
+    Table t;
+
+    t.insert({10, "apple"});
+    t.insert({1034, "banana"}); // Will collide with 10 in mod 1024
+    t.insert({2048, "cherry"});
+    t.insert({10, "updated-apple"}); // Should overwrite key 10
+
+    t.remove(1034);
+
+    cout << "Final Hash Table (non-empty entries):" << endl;
+    t.printTable();
+
+    cout << "\nSize of table: " << t.size() << endl;
+    cout << "Is key 10 present? " << (t.isPresent(10) ? "Yes" : "No") << endl;
+    cout << "Is key 1034 present? " << (t.isPresent(1034) ? "Yes" : "No") << endl;
+
+    return 0;
+}
